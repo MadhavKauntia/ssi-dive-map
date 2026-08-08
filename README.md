@@ -1,16 +1,16 @@
-# Dive Log
+# Dive Map
 
-A public, **map-first dive logbook**. Your whole diving history as a quiet,
-dark, full-screen map — one glowing marker per site, sized by how often you've
-dived it — with a page for every dive underneath.
+A public, **map-first record of every dive you've done**. Your whole diving
+history as a quiet, dark, full-screen map — one glowing marker per site, sized
+by how often you've dived it — with a page for every dive underneath.
 
 Built to be **forked**: point it at your own logbook, change one config line,
 and it's yours. Fully static — it deploys to any static host and needs no
 server, no database, and no API keys at runtime.
 
-**🌊 Live demo:** [dives.madhavkauntia.com](https://dives.madhavkauntia.com) — the maintainer's own dive log, running this exact code.
+**🌊 Live demo:** [dives.madhavkauntia.com](https://dives.madhavkauntia.com) — the maintainer's own dive map, running this exact code.
 
-![Dive Log — the map](.github/assets/screenshot.png)
+![Dive Map — every site on one screen](.github/assets/screenshot.png)
 
 ## Features
 
@@ -29,7 +29,7 @@ server, no database, and no API keys at runtime.
 ## Quick start
 
 ```bash
-git clone <your-fork-url> dive-log && cd dive-log
+git clone <your-fork-url> ssi-dive-map && cd ssi-dive-map
 npm install
 npm run dev            # http://localhost:3000
 ```
@@ -40,7 +40,7 @@ data. Replace it with your own (see **Your data** below) and:
 1. Open [`site.config.ts`](site.config.ts) and set your name + dive goal:
    ```ts
    export const siteConfig = {
-     owner: "Ada",     // → "Ada's Dive Log"
+     owner: "Ada",     // → "Ada's Dive Map"
      diveGoal: 100,
    };
    ```
