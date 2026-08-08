@@ -3,13 +3,13 @@
  * user-facing (page title, stats heading, the progress goal) reads from here.
  */
 export const siteConfig = {
-  /** Shown as "<owner>'s Dive Log" in the title and stats panel. */
+  /** Shown as "<owner>'s Dive Map" in the title and stats panel. */
   owner: "Madhav",
   /** The dive count you're working toward — drives the progress bar. */
   diveGoal: 50,
 };
 
-/** "Madhav's Dive Log" — handles a trailing "s" gracefully. */
+/** "Madhav's Dive Map" — handles a trailing "s" gracefully. */
 export const logTitle = `${siteConfig.owner}${
   siteConfig.owner.endsWith("s") ? "'" : "'s"
-} Dive Log`;
+} Dive Map`;
