@@ -8,10 +8,9 @@ Built to be **forked**: point it at your own logbook, change one config line,
 and it's yours. Fully static — it deploys to any static host and needs no
 server, no database, and no API keys at runtime.
 
-![Dive Log — the map](docs/screenshot.png)
+**🌊 Live demo:** [dives.madhavkauntia.com](https://dives.madhavkauntia.com) — the maintainer's own dive log, running this exact code.
 
-> The design source of truth lives in [`docs/`](docs/) (`design-spec.md` and a
-> `mockup.html` you can open directly in a browser).
+![Dive Log — the map](.github/assets/screenshot.png)
 
 ## Features
 
