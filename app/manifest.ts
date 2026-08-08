@@ -1,0 +1,19 @@
+import type { MetadataRoute } from "next";
+import { logTitle } from "@/site.config";
+
+// Required for `output: 'export'` — emit a static manifest.webmanifest.
+export const dynamic = "force-static";
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: logTitle,
+    short_name: "Dive Log",
+    icons: [
+      { src: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+      { src: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    theme_color: "#05090c",
+    background_color: "#05090c",
+    display: "standalone",
+  };
+}

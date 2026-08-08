@@ -1,0 +1,110 @@
+{
+  "75161": {
+    "id": 75161,
+    "name": "The Wall",
+    "slug": "the-wall",
+    "lat": 12.0557,
+    "lng": 92.9619,
+    "region": "India",
+    "country": "India"
+  },
+  "75162": {
+    "id": 75162,
+    "name": "Red Pillar / Peel Island Reef",
+    "slug": "red-pillar-peel-island-reef",
+    "lat": 12.0481,
+    "lng": 92.9841,
+    "region": "Andaman and Nicobar Islands",
+    "country": "India"
+  },
+  "75163": {
+    "id": 75163,
+    "name": "Lighthouse",
+    "slug": "lighthouse",
+    "lat": 12.0452,
+    "lng": 92.963,
+    "region": "",
+    "country": ""
+  },
+  "75171": {
+    "id": 75171,
+    "name": "Nemo Reef",
+    "slug": "nemo-reef",
+    "lat": 12.0389,
+    "lng": 92.9869,
+    "region": "Andaman and Nicobar Islands",
+    "country": "India"
+  },
+  "118730": {
+    "id": 118730,
+    "name": "Lapus-Lapus",
+    "slug": "lapus-lapus",
+    "lat": 11.3469,
+    "lng": 124.105,
+    "region": "Philippines",
+    "country": "Philippines"
+  },
+  "209386": {
+    "id": 209386,
+    "name": "Monad Shoal",
+    "slug": "monad-shoal",
+    "lat": 11.3012,
+    "lng": 124.1881,
+    "region": "Central Visayas",
+    "country": "Philippines"
+  },
+  "228300": {
+    "id": 228300,
+    "name": "I-95",
+    "slug": "i-95",
+    "lat": 12.1201,
+    "lng": 92.9457,
+    "region": "India",
+    "country": "India"
+  },
+  "239677": {
+    "id": 239677,
+    "name": "Gato Island",
+    "slug": "gato-island",
+    "lat": 11.4466,
+    "lng": 124.0187,
+    "region": "Philippines",
+    "country": "Philippines"
+  },
+  "241798": {
+    "id": 241798,
+    "name": "Kimud Shoal",
+    "slug": "kimud-shoal",
+    "lat": 11.2964,
+    "lng": 124.2662,
+    "region": "Philippines",
+    "country": "Philippines"
+  },
+  "247984": {
+    "id": 247984,
+    "name": "Slope",
+    "slug": "slope",
+    "lat": 12.0578,
+    "lng": 92.9608,
+    "region": "India",
+    "country": "India"
+  },
+  "247985": {
+    "id": 247985,
+    "name": "Tribe Gate",
+    "slug": "tribe-gate",
+    "lat": 12.039,
+    "lng": 93.0158,
+    "region": "Andaman and Nicobar Islands",
+    "country": "India"
+  },
+  "275155": {
+    "id": 275155,
+    "name": "Temple Reef",
+    "slug": "temple-reef",
+    "lat": 11.9213,
+    "lng": 79.8566,
+    "region": "Puducherry",
+    "country": "India"
+  }
+}

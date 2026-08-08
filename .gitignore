@@ -1,0 +1,27 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# env — credentials never enter the repo (see spec §7)
+.env
+.env.local
+.env*.local
+
+# typescript
+next-env.d.ts
+*.tsbuildinfo

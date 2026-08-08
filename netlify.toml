@@ -1,0 +1,8 @@
+# Static export — Netlify just publishes the pre-built `out/` directory.
+# No Next.js runtime/plugin needed (nothing runs on a server).
+[build]
+  command = "npm run build"
+  publish = "out"
+
+[build.environment]
+  NODE_VERSION = "22"

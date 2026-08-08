@@ -1,0 +1,56 @@
+name: Refresh dives from SSI
+
+# Pulls the latest logbook from SSI, and if anything changed, commits the new
+# content and pushes — which triggers your host's Git deploy (Netlify, Vercel,
+# Cloudflare Pages, …). The importer never overwrites existing dive files, so
+# hand-authored notes are preserved.
+#
+# Requires two repository secrets: SSI_EMAIL and SSI_PASSWORD.
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC — dives are infrequent
+  workflow_dispatch: {} # run manually right after a trip
+
+concurrency:
+  group: refresh-dives
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Import from SSI
+        env:
+          SSI_EMAIL: ${{ secrets.SSI_EMAIL }}
+          SSI_PASSWORD: ${{ secrets.SSI_PASSWORD }}
+        run: npm run import
+
+      # Sanity gate: never push data that breaks the static export.
+      - name: Verify build
+        run: npm run build
+
+      - name: Commit refreshed data
+        run: |
+          if [[ -n "$(git status --porcelain content)" ]]; then
+            git config user.name "dive-log-bot"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add content
+            git commit -m "chore(data): refresh dives from SSI"
+            git push
+          else
+            echo "No new dives — nothing to commit."
+          fi

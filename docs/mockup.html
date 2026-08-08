@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>madhav's dive log</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  :root{
+    --ink:#e7eef2; --dim:#8ea3ad; --faint:#5b6f78;
+    --teal:#5fd0c4; --teal-soft:#3a8f88; --amber:#ffcf8a;
+    --panel:rgba(10,18,22,0.72); --line:rgba(120,150,160,0.18);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#05090c;
+    font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink)}
+  #map{position:fixed;inset:0;background:#05090c;z-index:0}
+  /* kill leaflet's default chrome to keep it quiet */
+  .leaflet-container{background:#05090c;outline:none}
+  .leaflet-control-attribution{background:rgba(5,9,12,.6)!important;color:var(--faint)!important;font-size:9px}
+  .leaflet-control-attribution a{color:var(--faint)!important}
+  .leaflet-control-zoom{border:none!important;margin:16px!important}
+  .leaflet-control-zoom a{
+    background:var(--panel)!important;color:var(--dim)!important;border:1px solid var(--line)!important;
+    width:30px!important;height:30px!important;line-height:30px!important;backdrop-filter:blur(8px)}
+  .leaflet-control-zoom a:hover{color:var(--ink)!important}
+
+  /* ---- stats, top-right ---- */
+  .stats{position:fixed;top:20px;right:20px;z-index:500;width:238px;
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    backdrop-filter:blur(14px);padding:18px 20px 20px;
+    box-shadow:0 8px 40px rgba(0,0,0,.5)}
+  .stats h1{margin:0 0 20px;font-size:11px;font-weight:600;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--dim)}
+  .stats .sub{font-size:10px;letter-spacing:.14em;color:var(--faint);margin-bottom:16px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+  .stat .n{font-size:26px;font-weight:300;letter-spacing:.01em;line-height:1;color:var(--ink)}
+  .stat .n small{font-size:13px;color:var(--dim);margin-left:2px}
+  .stat .l{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-top:5px}
+  .prog{margin-top:18px}
+  .prog .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+  .prog .cap{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+  .prog .val{font-size:11px;color:var(--dim);letter-spacing:.08em}
+  .bar{height:3px;background:rgba(120,150,160,.15);border-radius:2px;overflow:hidden}
+  .bar>span{display:block;height:100%;width:38%;
+    background:linear-gradient(90deg,var(--teal-soft),var(--teal));border-radius:2px}
+
+  /* ---- hover detail: floating card anchored above the marker ---- */
+  .leaflet-tooltip.dive-tip{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    backdrop-filter:blur(14px);padding:13px 16px 14px;
+    box-shadow:0 8px 40px rgba(0,0,0,.55);color:var(--ink);white-space:nowrap;
+    opacity:1;transition:opacity .2s ease}
+  .leaflet-tooltip.dive-tip:before{display:none} /* hide leaflet's default arrow */
+  .leaflet-tooltip.dive-tip .name{font-size:15px;font-weight:400;letter-spacing:.02em;color:var(--ink)}
+  .leaflet-tooltip.dive-tip .place{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-top:3px}
+  .leaflet-tooltip.dive-tip .row{display:flex;gap:20px;margin-top:12px}
+  .leaflet-tooltip.dive-tip .row .n{font-size:18px;font-weight:300;color:var(--ink)}
+  .leaflet-tooltip.dive-tip .row .n small{font-size:10px;color:var(--dim);margin-left:1px}
+  .leaflet-tooltip.dive-tip .row .l{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-top:3px}
+  /* small connector dot below the card */
+  .leaflet-tooltip.dive-tip:after{content:"";position:absolute;left:50%;bottom:-5px;
+    width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--teal);opacity:.7}
+
+  /* resting title, bottom-left */
+  .title{position:fixed;left:22px;bottom:20px;z-index:500}
+  .title .brand{font-size:12px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
+  .title .hint{font-size:10px;letter-spacing:.1em;color:var(--faint);margin-top:6px}
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+<div class="stats">
+  <h1>Madhav's Dive Log</h1>
+  <div class="grid">
+    <div class="stat"><div class="n">19</div><div class="l">Dives</div></div>
+    <div class="stat"><div class="n">12</div><div class="l">Sites</div></div>
+    <div class="stat"><div class="n">2</div><div class="l">Countries</div></div>
+    <div class="stat"><div class="n">28<small>m</small></div><div class="l">Deepest</div></div>
+    <div class="stat"><div class="n">14<small>h</small></div><div class="l">Underwater</div></div>
+  </div>
+  <div class="prog">
+    <div class="top"><span class="cap">Toward 50</span><span class="val">19 / 50</span></div>
+    <div class="bar"><span></span></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+// --- real data, aggregated from the SSI feed (one entry per visited site) ---
+const SITES = [
+  {name:"The Wall",       place:"Havelock · Andaman", lat:12.0557, lng:92.9619, dives:2, depth:28, time:43},
+  {name:"Red Pillar",     place:"Peel Island · Andaman", lat:12.0481, lng:92.9841, dives:1, depth:10, time:48},
+  {name:"Lighthouse",     place:"Havelock · Andaman", lat:12.0452, lng:92.9630, dives:2, depth:19, time:42},
+  {name:"Nemo Reef",      place:"Havelock · Andaman", lat:12.0389, lng:92.9869, dives:2, depth:11, time:34},
+  {name:"I-95",           place:"Andaman", lat:12.1201, lng:92.9457, dives:1, depth:16, time:42},
+  {name:"Slope",          place:"Havelock · Andaman", lat:12.0578, lng:92.9608, dives:1, depth:10, time:48},
+  {name:"Tribe Gate",     place:"Havelock · Andaman", lat:12.0390, lng:93.0158, dives:2, depth:12, time:49},
+  {name:"Temple Reef",    place:"Pondicherry", lat:11.9213, lng:79.8566, dives:2, depth:18, time:39},
+  {name:"Lapus-Lapus",    place:"Malapascua · Cebu", lat:11.3469, lng:124.1050, dives:1, depth:24, time:44},
+  {name:"Monad Shoal",    place:"Malapascua · Cebu", lat:11.3012, lng:124.1881, dives:1, depth:26, time:57},
+  {name:"Gato Island",    place:"Malapascua · Cebu", lat:11.4466, lng:124.0187, dives:2, depth:25, time:43},
+  {name:"Kimud Shoal",    place:"Malapascua · Cebu", lat:11.2964, lng:124.2662, dives:2, depth:27, time:56},
+];
+
+const map = L.map('map',{zoomControl:true, attributionControl:true, worldCopyJump:true})
+  .setView([12,108], 5);
+
+// dark, low-noise ocean basemap
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{
+  subdomains:'abcd', maxZoom:19,
+  attribution:'© OpenStreetMap © CARTO'
+}).addTo(map);
+
+function tipHTML(s){
+  return `<div class="name">${s.name}</div>
+    <div class="place">${s.place}</div>
+    <div class="row">
+      <div><div class="n">${s.dives}</div><div class="l">Dives here</div></div>
+      <div><div class="n">${s.depth}<small>m</small></div><div class="l">Max depth</div></div>
+      <div><div class="n">${s.time}<small>min</small></div><div class="l">Avg time</div></div>
+    </div>`;
+}
+
+const markers=[];
+for(const s of SITES){
+  const r = 6 + s.dives*2.4;            // size hints dive count
+  const m = L.circleMarker([s.lat,s.lng],{
+    radius:r, color:'#5fd0c4', weight:1.4, opacity:.9,
+    fillColor:'#5fd0c4', fillOpacity:.16
+  }).addTo(map);
+  // soft halo underneath
+  L.circleMarker([s.lat,s.lng],{radius:r+7,color:'#5fd0c4',weight:0,
+    fillColor:'#5fd0c4',fillOpacity:.06,interactive:false}).addTo(map);
+  // detail card floats above the marker
+  m.bindTooltip(tipHTML(s),{
+    className:'dive-tip', direction:'top', offset:[0,-(r+8)],
+    opacity:1, sticky:false
+  });
+  m.on('mouseover',()=>{ m.setStyle({fillOpacity:.42,weight:2}); });
+  m.on('mouseout', ()=>{ m.setStyle({fillOpacity:.16,weight:1.4}); });
+  markers.push(m);
+}
+
+// frame both dive regions (Bay of Bengal + Philippine Sea)
+const bounds = L.latLngBounds(SITES.map(s=>[s.lat,s.lng])).pad(0.35);
+map.fitBounds(bounds);
+
+// very slow "breathing" on the markers — Madhav FM DNA, barely perceptible
+let t=0;
+setInterval(()=>{
+  t+=0.03;
+  const k = 0.16 + Math.sin(t)*0.05;
+  markers.forEach((m,i)=>{ if(!m._hovered) m.setStyle({fillOpacity:k+ (i%3)*0.01}); });
+}, 60);
+</script>
+</body>
+</html>
