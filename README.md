@@ -103,7 +103,7 @@ if the import fails, nothing is pushed and the live site is untouched.
 
 | Where | What |
 |---|---|
-| `site.config.ts` → `siteConfig` | Owner name, dive goal, source repo (corner watermark). |
+| `site.config.ts` → `siteConfig` | Owner name, dive goal. |
 | `site.config.ts` → `mapTheme` | Basemap style, marker/accent color, recolor palette, labels. |
 | `content/` | Your sites + dives (the data). |
 | `app/globals.css` `:root` / `tailwind.config.ts` | The UI palette (panels, text). |
@@ -136,4 +136,5 @@ opening a PR.
 
 ## License
 
-[MIT](LICENSE) — fork it, dive with it, make it your own.
+[MIT](LICENSE) — fork it, dive with it, make it your own. The one ask: the
+small corner credit links back to this project, so please leave it in place.

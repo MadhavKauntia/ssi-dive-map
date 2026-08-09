@@ -8,17 +8,12 @@ export const siteConfig = {
   owner: "Madhav",
   /** The dive count you're working toward — drives the progress bar. */
   diveGoal: 50,
-  /** Source repo, linked from the corner watermark. Point forks at your own. */
-  repo: "https://github.com/MadhavKauntia/ssi-dive-map",
 };
 
 /** "Madhav's Dive Map" — handles a trailing "s" gracefully. */
 export const logTitle = `${siteConfig.owner}${
   siteConfig.owner.endsWith("s") ? "'" : "'s"
 } Dive Map`;
-
-/** "MadhavKauntia/ssi-dive-map" — the repo shown on the watermark. */
-export const repoLabel = siteConfig.repo.replace(/^https?:\/\/github\.com\//, "");
 
 /**
  * Map appearance. Change any of this without touching component code.
