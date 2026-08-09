@@ -5,11 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Map as MLMap, GeoJSONSource } from "maplibre-gl";
 import type { SiteAgg, Stats } from "@/lib/content";
+import { mapTheme, basemapUrl } from "@/site.config";
 import StatsPanel from "./StatsPanel";
 
-// Dark, low-noise vector basemap — no key, no billing (spec §1).
-const BASEMAP_STYLE = "https://tiles.openfreemap.org/styles/dark";
-const TEAL = "#5fd0c4";
+// Map appearance is configurable in site.config.ts.
+const TEAL = mapTheme.accent;
 
 type Active = { site: SiteAgg; pinned: boolean };
 
@@ -49,7 +49,7 @@ export default function MapView({
 
       map = new maplibregl.Map({
         container: containerRef.current,
-        style: BASEMAP_STYLE,
+        style: basemapUrl,
         attributionControl: false,
         // rough center; fitBounds on load frames both regions properly
         center: [108, 12],
@@ -85,22 +85,24 @@ export default function MapView({
       };
 
       const onLoad = () => {
-        // Recolor the basemap to the abyss palette. Type-check every layer —
+        // Apply the configured theme to the basemap. Type-check every layer —
         // "fill-color" on a line layer (e.g. waterway) throws, and a throw here
         // would abort marker setup entirely. Guarded, so it degrades quietly.
+        const { recolor, hideLabels } = mapTheme;
         for (const layer of map.getStyle().layers ?? []) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const l = layer as any;
-          if (layer.type === "symbol") {
-            // strip the basemap's own labels — no road/POI text (§3)
+          if (hideLabels && layer.type === "symbol") {
+            // strip the basemap's own labels — a quieter map (§3)
             map.setLayoutProperty(layer.id, "visibility", "none");
-          } else if (layer.type === "background") {
-            map.setPaintProperty(layer.id, "background-color", "#05090c");
+          } else if (recolor && layer.type === "background") {
+            map.setPaintProperty(layer.id, "background-color", recolor.background);
           } else if (
+            recolor &&
             layer.type === "fill" &&
             /water/i.test(`${layer.id} ${l["source-layer"] ?? ""}`)
           ) {
-            map.setPaintProperty(layer.id, "fill-color", "#0a1319");
+            map.setPaintProperty(layer.id, "fill-color", recolor.water);
           }
         }
 
@@ -318,7 +320,10 @@ export default function MapView({
   const card = active;
 
   return (
-    <div className="fixed inset-0 bg-abyss">
+    <div
+      className="fixed inset-0"
+      style={{ background: mapTheme.recolor?.background ?? "#05090c" }}
+    >
       <div ref={containerRef} className="absolute inset-0" />
 
       <StatsPanel stats={stats} />

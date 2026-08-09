@@ -103,10 +103,23 @@ if the import fails, nothing is pushed and the live site is untouched.
 
 | Where | What |
 |---|---|
-| `site.config.ts` | Owner name, dive goal (title, heading, progress bar). |
+| `site.config.ts` → `siteConfig` | Owner name, dive goal, source repo (corner watermark). |
+| `site.config.ts` → `mapTheme` | Basemap style, marker/accent color, recolor palette, labels. |
 | `content/` | Your sites + dives (the data). |
-| `app/globals.css` `:root` / `tailwind.config.ts` | The palette. |
-| `components/MapView.tsx` | Basemap style, marker sizing, clustering. |
+| `app/globals.css` `:root` / `tailwind.config.ts` | The UI palette (panels, text). |
+| `components/MapView.tsx` | Marker sizing and clustering behavior. |
+
+Swapping the map theme is a one-liner — e.g. `basemap: "positron"` for a light
+map, or set `recolor: null` to keep a style's native colors:
+
+```ts
+export const mapTheme = {
+  basemap: "dark",          // "dark" | "positron" | "liberty" | "bright" | style URL
+  accent: "#5fd0c4",        // markers, halos, clusters
+  recolor: { background: "#05090c", water: "#0a1319" }, // or null
+  hideLabels: true,
+};
+```
 
 ## Tech
 
