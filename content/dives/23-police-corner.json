@@ -1,0 +1,13 @@
+{
+  "number": 23,
+  "date": "2026-10-14",
+  "time": "09:00",
+  "site": 108656,
+  "maxDepthM": 22,
+  "avgDepthM": null,
+  "durationMin": 40,
+  "waterTempC": null,
+  "visibilityM": null,
+  "verified": true,
+  "notes": ""
+}

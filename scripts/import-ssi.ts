@@ -15,6 +15,12 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 
 import { join } from "node:path";
 
 const APP = "0815_ADR";
+// Since 2026-10-07 SSI rejects tokens from requests that don't identify as the
+// official MySSI app: calls must carry the app `version` param AND the MySSI
+// User-Agent, or every authenticated endpoint returns "token_not_valid".
+const APP_VERSION = "ADR_4.1.268-ssi";
+const USER_AGENT = "Dart/3.12 (dart:io)";
+const HEADERS = { "User-Agent": USER_AGENT };
 const BASE = "https://api.divessi.com/app/a21.php";
 const SITES_PATH = "content/sites.json";
 const DIVES_DIR = "content/dives";
@@ -29,8 +35,8 @@ function num(v: unknown): number | null {
 
 // --- API -------------------------------------------------------------------
 async function authenticate(email: string, password: string): Promise<string> {
-  const url = `${BASE}?l=${encodeURIComponent(email)}&p=${encodeURIComponent(password)}&what=authenticate&ssiapp=${APP}`;
-  const res = await fetch(url);
+  const url = `${BASE}?l=${encodeURIComponent(email)}&p=${encodeURIComponent(password)}&what=authenticate&ssiapp=${APP}&version=${encodeURIComponent(APP_VERSION)}`;
+  const res = await fetch(url, { headers: HEADERS });
   if (!res.ok) throw new Error(`auth HTTP ${res.status}`);
   const data: any = await res.json();
   if (data?.authenticated === false) {
@@ -55,8 +61,8 @@ async function authenticate(email: string, password: string): Promise<string> {
 }
 
 async function fetchDivelog(token: string): Promise<any> {
-  const url = `${BASE}?what=get_divelog&token=${encodeURIComponent(token)}&ssiapp=${APP}`;
-  const res = await fetch(url);
+  const url = `${BASE}?what=get_divelog&token=${encodeURIComponent(token)}&ssiapp=${APP}&version=${encodeURIComponent(APP_VERSION)}`;
+  const res = await fetch(url, { headers: HEADERS });
   if (!res.ok) throw new Error(`divelog HTTP ${res.status}`);
   const data: any = await res.json();
   // The endpoint returns HTTP 200 with a JSON error body on an invalid/
