@@ -33,10 +33,23 @@ async function authenticate(email: string, password: string): Promise<string> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`auth HTTP ${res.status}`);
   const data: any = await res.json();
+  if (data?.authenticated === false) {
+    throw new Error(`auth rejected: ${data?.error_message || data?.authenticated_message || "login failed"}`);
+  }
   // Be defensive: the token field name is undocumented. Try the obvious spots.
   const token = data?.token ?? data?.session ?? data?.data?.token;
   if (!token || typeof token !== "string") {
     throw new Error("auth: no token in response (shape changed — inspect and update)");
+  }
+  // SSI issues a token even when consent is pending, but that token is NOT
+  // authorized for get_divelog — the feed comes back empty and the import looks
+  // like a successful no-op. Fail loudly so the cause is visible, not silent.
+  if (data?.privacy_settings_required === true || data?.marketing_required === true) {
+    throw new Error(
+      "SSI consent gate: your account has pending privacy/marketing settings, so the " +
+        "issued token is not authorized for the logbook. Log in to MySSI " +
+        "(app or my.divessi.com) and accept the updated privacy settings, then re-run."
+    );
   }
   return token;
 }
@@ -45,7 +58,14 @@ async function fetchDivelog(token: string): Promise<any> {
   const url = `${BASE}?what=get_divelog&token=${encodeURIComponent(token)}&ssiapp=${APP}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`divelog HTTP ${res.status}`);
-  return res.json();
+  const data: any = await res.json();
+  // The endpoint returns HTTP 200 with a JSON error body on an invalid/
+  // unauthorized token (e.g. status:401, "token_not_valid"). Detect it instead
+  // of treating a missing logbook as "zero dives".
+  if (data && !Array.isArray(data) && (data.status >= 400 || data.authenticated === false)) {
+    throw new Error(`divelog rejected: ${data?.result || data?.message || `status ${data?.status}`}`);
+  }
+  return data;
 }
 
 // --- mapping ---------------------------------------------------------------
@@ -158,6 +178,20 @@ async function main() {
 
   const sites = mapSites(feed);
   const dives = mapDives(feed);
+
+  // Anomaly guard: an authorized, healthy feed always echoes back the full
+  // logbook. If it yields zero dives while we already have dive files on disk,
+  // something upstream is wrong (expired/unauthorized token, API change) — do
+  // NOT proceed as a silent no-op. Bail so the job goes red.
+  const haveOnDisk = existsSync(DIVES_DIR) &&
+    readdirSync(DIVES_DIR).some((f) => f.endsWith(".json"));
+  if (dives.length === 0 && haveOnDisk) {
+    throw new Error(
+      "feed returned 0 dives but local dives exist — refusing to treat as a no-op. " +
+        "Likely an unauthorized token or an SSI API change; inspect the get_divelog response."
+    );
+  }
+
   mergeSites(sites);
   const res = writeDives(dives, sites);
 
