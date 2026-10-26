@@ -47,16 +47,10 @@ async function authenticate(email: string, password: string): Promise<string> {
   if (!token || typeof token !== "string") {
     throw new Error("auth: no token in response (shape changed — inspect and update)");
   }
-  // SSI issues a token even when consent is pending, but that token is NOT
-  // authorized for get_divelog — the feed comes back empty and the import looks
-  // like a successful no-op. Fail loudly so the cause is visible, not silent.
-  if (data?.privacy_settings_required === true || data?.marketing_required === true) {
-    throw new Error(
-      "SSI consent gate: your account has pending privacy/marketing settings, so the " +
-        "issued token is not authorized for the logbook. Log in to MySSI " +
-        "(app or my.divessi.com) and accept the updated privacy settings, then re-run."
-    );
-  }
+  // NB: the auth response may report privacy_settings_required/marketing_required
+  // = true. Those flags do NOT gate logbook access — get_divelog works fine with
+  // them set, as long as the request carries the MySSI User-Agent + version. The
+  // real authorization gate is handled in fetchDivelog (401 detection).
   return token;
 }
 
